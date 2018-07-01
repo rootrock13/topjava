@@ -6,12 +6,14 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MealDaoImplementation implements MealDao {
 
     private static MealDao instance;
     private static Map<Integer, Meal> storage;
-    private static int currentId;
+    private static AtomicInteger currentId = new AtomicInteger(0);
 
     private MealDaoImplementation() {
         storage = new ConcurrentHashMap<>();
@@ -36,9 +38,8 @@ public class MealDaoImplementation implements MealDao {
 
     @Override
     public synchronized void add(Meal meal) {
-        currentId++;
-        meal.setId(currentId);
-        storage.put(currentId, meal);
+        meal.setId(currentId.incrementAndGet());
+        storage.put(currentId.get(), meal);
     }
 
     @Override
@@ -48,8 +49,8 @@ public class MealDaoImplementation implements MealDao {
 
     @Override
     public List<Meal> getAll() {
-        List<Meal> meals = new ArrayList<>(storage.values());
-        Collections.sort(meals, new Comparator<Meal>() {
+        List<Meal> meals = new CopyOnWriteArrayList<>(storage.values());
+        meals.sort(new Comparator<Meal>() {
             @Override
             public int compare(Meal o1, Meal o2) {
                 return o1.getDateTime().compareTo(o2.getDateTime());
