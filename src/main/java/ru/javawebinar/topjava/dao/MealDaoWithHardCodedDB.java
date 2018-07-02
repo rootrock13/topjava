@@ -37,7 +37,7 @@ public class MealDaoWithHardCodedDB implements MealDao {
     @Override
     public Meal add(Meal meal) {
         Meal savedMeal = addToStorage(meal);
-        log.debug(String.format("save meal with id = %d", savedMeal.getId()));
+        log.debug(String.format("save new meal with id = %d", savedMeal.getId()));
         return savedMeal;
     }
 
