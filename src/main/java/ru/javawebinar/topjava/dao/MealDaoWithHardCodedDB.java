@@ -14,31 +14,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MealDaoWithHardCodedDB implements MealDao {
 
-    private static AtomicInteger currentId = new AtomicInteger(0);
-    private static Map<Integer, Meal> storage = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(MealDaoWithHardCodedDB.class);
+    private AtomicInteger currentId;
+    private Map<Integer, Meal> storage;
 
-    static {
-        addToStorage(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500));
-        addToStorage(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000));
-        addToStorage(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500));
-        addToStorage(new Meal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000));
-        addToStorage(new Meal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500));
-        addToStorage(new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510));
+    public MealDaoWithHardCodedDB() {
+        currentId = new AtomicInteger(0);
+        storage = new ConcurrentHashMap<>();
         log.debug("fill storage");
-    }
-
-    private static Meal addToStorage(Meal meal) {
-        meal.setId(currentId.incrementAndGet());
-        storage.put(currentId.get(), meal);
-        return meal;
+        add(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 10, 0), "Завтрак", 500));
+        add(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 13, 0), "Обед", 1000));
+        add(new Meal(LocalDateTime.of(2015, Month.MAY, 30, 20, 0), "Ужин", 500));
+        add(new Meal(LocalDateTime.of(2015, Month.MAY, 31, 10, 0), "Завтрак", 1000));
+        add(new Meal(LocalDateTime.of(2015, Month.MAY, 31, 13, 0), "Обед", 500));
+        add(new Meal(LocalDateTime.of(2015, Month.MAY, 31, 20, 0), "Ужин", 510));
     }
 
     @Override
     public Meal add(Meal meal) {
-        Meal savedMeal = addToStorage(meal);
-        log.debug(String.format("save new meal with id = %d", savedMeal.getId()));
-        return savedMeal;
+        meal.setId(currentId.incrementAndGet());
+        storage.put(currentId.get(), meal);
+        log.debug(String.format("save new meal with id = %d", meal.getId()));
+        return meal;
     }
 
     @Override
