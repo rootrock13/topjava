@@ -89,11 +89,12 @@ public class MealServlet extends HttpServlet {
                 break;
             case "all":
             default:
-                log.info("getAll");
                 if (fromDate == null && toDate == null && fromTime == null && toTime == null) {
+                    log.info("getAll");
                     request.setAttribute("meals", controller.getAll());
                 } else {
-                    request.setAttribute("meals", controller.getAll(fromDate, toDate, fromTime, toTime));
+                    log.info("getBetweenDateAndTime {} {}, {} {}", fromDate, toDate, fromTime, toTime);
+                    request.setAttribute("meals", controller.getBetweenDateAndTime(fromDate, toDate, fromTime, toTime));
                 }
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;

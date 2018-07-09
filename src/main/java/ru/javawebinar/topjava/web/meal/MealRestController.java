@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava.web.meal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.Meal;
@@ -16,6 +18,9 @@ import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 @Controller
 public class MealRestController {
+
+    private static final Logger log = LoggerFactory.getLogger(MealRestController.class);
+
     private final MealService service;
 
     @Autowired
@@ -24,30 +29,32 @@ public class MealRestController {
     }
 
     public Meal create(Meal meal) {
+        log.info("create {}", meal);
         return service.create(meal, authUserId());
     }
 
     public void delete(int id) {
+        log.info("delete {}", id);
         service.delete(id, authUserId());
     }
 
     public Meal get(int id) {
+        log.info("get {}", id);
         return service.get(id, authUserId());
     }
 
     public void update(Meal meal) {
+        log.info("update {} meal");
         service.update(meal, authUserId());
     }
 
     public List<MealWithExceed> getAll() {
+        log.info("getAll");
         return MealsUtil.getWithExceeded(service.getAll(authUserId()), authUserCaloriesPerDay());
     }
 
-    public List<MealWithExceed> getAll(LocalDate fromDate, LocalDate toDate, LocalTime fromTime, LocalTime toTime) {
-        fromDate = fromDate == null ? LocalDate.MIN : fromDate;
-        toDate = toDate == null ? LocalDate.MAX : toDate;
-        fromTime = fromTime == null ? LocalTime.MIN : fromTime;
-        toTime = toTime == null ? LocalTime.MAX : toTime;
-        return service.getAll(authUserId(), authUserCaloriesPerDay(), fromDate, toDate, fromTime, toTime);
+    public List<MealWithExceed> getBetweenDateAndTime(LocalDate fromDate, LocalDate toDate, LocalTime fromTime, LocalTime toTime) {
+        log.info("getBetweenDateAndTime {} {}, {} {}", fromDate, toDate, fromTime, toTime);
+        return service.getBetweenDateAndTime(authUserId(), authUserCaloriesPerDay(), fromDate, toDate, fromTime, toTime);
     }
 }

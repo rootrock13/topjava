@@ -17,13 +17,22 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 
 public class MealsUtil {
-    public static final List<Meal> MEALS = Arrays.asList(
+    public static final List<Meal> MEALS_OF_USER_1 = Arrays.asList(
             new Meal(LocalDateTime.of(2018, Month.JULY, 5, 10, 0), "Завтрак", 500),
             new Meal(LocalDateTime.of(2018, Month.JULY, 5, 13, 0), "Обед", 1000),
             new Meal(LocalDateTime.of(2018, Month.JULY, 5, 20, 0), "Ужин", 500),
             new Meal(LocalDateTime.of(2018, Month.JULY, 6, 10, 0), "Завтрак", 1000),
             new Meal(LocalDateTime.of(2018, Month.JULY, 6, 13, 0), "Обед", 500),
             new Meal(LocalDateTime.of(2018, Month.JULY, 6, 20, 0), "Ужин", 510)
+    );
+    public static final List<Meal> MEALS_OF_USER_2 = Arrays.asList(
+            new Meal(LocalDateTime.of(2018, Month.JULY, 5, 10, 0), "Завтрак", 500),
+            new Meal(LocalDateTime.of(2018, Month.JULY, 5, 13, 0), "Обед", 1000),
+            new Meal(LocalDateTime.of(2018, Month.JULY, 5, 17, 30), "Ужин", 400),
+            new Meal(LocalDateTime.of(2018, Month.JULY, 6, 10, 0), "Завтрак", 900),
+            new Meal(LocalDateTime.of(2018, Month.JULY, 6, 13, 0), "Обед", 550),
+            new Meal(LocalDateTime.of(2018, Month.JULY, 6, 15, 0), "Полдник", 200),
+            new Meal(LocalDateTime.of(2018, Month.JULY, 6, 20, 0), "Ужин", 450)
     );
 
     public static final int DEFAULT_CALORIES_PER_DAY = 2000;
