@@ -67,7 +67,7 @@ public class MealServiceTest {
     @Test
     public void get() {
         Meal meal = service.get(USER_MEAL_1.getId(), USER_ID);
-        assertEquals(meal, USER_MEAL_1);
+        assertMatch(meal, USER_MEAL_1);
     }
 
     @Test(expected = NotFoundException.class)
@@ -88,7 +88,7 @@ public class MealServiceTest {
         List<Meal> meals = service.getBetweenDateTimes(LocalDateTime.parse("2018-07-05T10:00"),
                 LocalDateTime.parse("2018-07-05T10:00"), USER_ID);
         assertEquals(meals.size(), 1);
-        assertEquals(meals.iterator().next(), USER_MEAL_1);
+        assertMatch(meals.iterator().next(), USER_MEAL_1);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class MealServiceTest {
         updated.setDateTime(updated.getDateTime().plusHours(1));
         updated.setCalories(100500);
         service.update(updated, USER_ID);
-        assertEquals(service.get(USER_MEAL_1.getId(), USER_ID), updated);
+        assertMatch(service.get(USER_MEAL_1.getId(), USER_ID), updated);
     }
 
     @Test(expected = NotFoundException.class)
