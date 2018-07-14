@@ -4,6 +4,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.repository.mock.InMemoryMealRepositoryImpl;
 import ru.javawebinar.topjava.to.MealWithExceed;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 import ru.javawebinar.topjava.web.user.AdminRestController;
@@ -24,10 +25,12 @@ public class SpringMain {
             System.out.println();
 
             MealRestController mealController = appCtx.getBean(MealRestController.class);
+            InMemoryMealRepositoryImpl repository = appCtx.getBean(InMemoryMealRepositoryImpl.class);
+            repository.init();
             List<MealWithExceed> filteredMealsWithExceeded =
                     mealController.getBetween(
-                            LocalDate.of(2015, Month.MAY, 30), LocalTime.of(7, 0),
-                            LocalDate.of(2015, Month.MAY, 31), LocalTime.of(11, 0));
+                            LocalDate.of(2018, Month.JULY, 5), LocalTime.of(7, 0),
+                            LocalDate.of(2018, Month.JULY, 6), LocalTime.of(11, 0));
             filteredMealsWithExceeded.forEach(System.out::println);
         }
     }
