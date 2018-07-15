@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.service;
 
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -17,13 +16,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
 @ContextConfiguration({
         "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-repository.xml",
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
@@ -79,16 +78,14 @@ public class MealServiceTest {
     public void getBetweenDates() {
         List<Meal> meals = service.getBetweenDates(LocalDate.parse("2018-07-05"),
                 LocalDate.parse("2018-07-05"), USER_ID);
-        assertEquals(meals.size(), 3);
         assertMatch(meals, USER_MEAL_3, USER_MEAL_2, USER_MEAL_1);
     }
 
     @Test
     public void getBetweenDateTimes() {
         List<Meal> meals = service.getBetweenDateTimes(LocalDateTime.parse("2018-07-05T10:00"),
-                LocalDateTime.parse("2018-07-05T10:00"), USER_ID);
-        assertEquals(meals.size(), 1);
-        assertMatch(meals.iterator().next(), USER_MEAL_1);
+                LocalDateTime.parse("2018-07-05T13:00"), USER_ID);
+        assertMatch(meals, USER_MEAL_2, USER_MEAL_1);
     }
 
     @Test

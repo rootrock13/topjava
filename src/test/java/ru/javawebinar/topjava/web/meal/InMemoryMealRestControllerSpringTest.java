@@ -18,7 +18,10 @@ import java.util.Collection;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 
-@ContextConfiguration("classpath:spring/test-spring-app.xml")
+@ContextConfiguration({
+        "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-repository-test.xml"
+})
 @RunWith(SpringRunner.class)
 public class InMemoryMealRestControllerSpringTest {
 
