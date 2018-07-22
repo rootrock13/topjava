@@ -1,8 +1,13 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.*;
+
+import org.junit.AfterClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.Stopwatch;
 import org.junit.rules.TestName;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +22,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -31,6 +37,8 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 public class MealServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_RESET = "\u001B[0m";
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -39,37 +47,37 @@ public class MealServiceTest {
     public TestName name = new TestName();
 
     private static StringBuilder summary = new StringBuilder();
-    private long start;
     private static long total;
+
+    @Rule
+    public Stopwatch stopWatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            long elapsed = TimeUnit.NANOSECONDS.toMillis(nanos);
+            total += elapsed;
+            String result = String.format("Test\t%14s\ttooks\t%4d\tms\n", name.getMethodName(), elapsed);
+            summary.append(result);
+            log.info(ANSI_GREEN + result + ANSI_RESET);
+        }
+    };
 
     static {
         SLF4JBridgeHandler.install();
     }
 
-    @Before
-    public void start() {
-        start = System.currentTimeMillis();
-    }
-
-    @After
-    public void end() {
-        long elapsed = System.currentTimeMillis() - start;
-        total += elapsed;
-        String result = String.format("Test\t%14s\ttooks\t%4d\tms\n", name.getMethodName(), System.currentTimeMillis() - start);
-        summary.append(result);
-        log.info(result);
-    }
-
     @AfterClass
     public static void Summary() {
-        System.out.println("=========================================================================================");
-        System.out.println("================================ "
-                + MealServiceTest.class.getSimpleName() + " SUMMARY ================================");
-        System.out.println("=========================================================================================");
-        System.out.print(summary.toString());
-        System.out.println("=========================================================================================");
-        System.out.println(String.format("Tests total elapsed time:\t\t%4d\tms", total));
-        System.out.println("=========================================================================================\n");
+        log.info(ANSI_GREEN +
+                "\n=========================================================================================" +
+                "\n================================ MealServiceTest SUMMARY ================================" +
+                "\n=========================================================================================\n" +
+                summary.toString() +
+                "=========================================================================================" +
+                String.format("\nTests total elapsed time:\t\t%4d\tms", total) +
+                "\n=========================================================================================\n" +
+                ANSI_RESET
+        );
+
     }
 
     @Autowired
