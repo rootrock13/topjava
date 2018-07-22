@@ -55,7 +55,7 @@ public class MealServiceTest {
     public void end() {
         long elapsed = System.currentTimeMillis() - start;
         total += elapsed;
-        String result = String.format("Test\t%14s\t tooks\t%4d\tms\n", name.getMethodName(), System.currentTimeMillis() - start);
+        String result = String.format("Test\t%14s\ttooks\t%4d\tms\n", name.getMethodName(), System.currentTimeMillis() - start);
         summary.append(result);
         log.info(result);
     }
@@ -68,7 +68,7 @@ public class MealServiceTest {
         System.out.println("=========================================================================================");
         System.out.print(summary.toString());
         System.out.println("=========================================================================================");
-        System.out.println(String.format("Tests total elapsed time:\t\t%d\tms", total));
+        System.out.println(String.format("Tests total elapsed time:\t\t%4d\tms", total));
         System.out.println("=========================================================================================\n");
     }
 
