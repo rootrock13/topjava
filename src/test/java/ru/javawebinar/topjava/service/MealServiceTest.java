@@ -36,7 +36,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    private static final Logger log = LoggerFactory.getLogger("colored_logger");
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -64,17 +64,16 @@ public class MealServiceTest {
     }
 
     @AfterClass
-    public static void Summary() {
+    public static void summary() {
         log.info(
                 "\n=========================================================================================" +
-                "\n================================ MealServiceTest SUMMARY ================================" +
-                "\n=========================================================================================\n" +
-                summary.toString() +
-                "=========================================================================================" +
-                String.format("\nTests total elapsed time:\t\t%4d\tms", total) +
-                "\n=========================================================================================\n"
+                        "\n================================ MealServiceTest SUMMARY ================================" +
+                        "\n=========================================================================================\n" +
+                        summary.toString() +
+                        "=========================================================================================" +
+                        String.format("\nTests total elapsed time:\t\t%4d\tms", total) +
+                        "\n=========================================================================================\n"
         );
-
     }
 
     @Autowired

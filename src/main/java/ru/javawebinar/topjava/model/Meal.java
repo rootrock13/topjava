@@ -29,7 +29,7 @@ public class Meal extends AbstractBaseEntity {
     public static final String ALL_SORTED = "Meal.getAll";
     public static final String BETWEEN_SORTED = "Meal.getBetween";
 
-    @Column(name = "date_time")
+    @Column(name = "date_time", nullable = false)
     @NotNull
     private LocalDateTime dateTime;
 
@@ -38,7 +38,7 @@ public class Meal extends AbstractBaseEntity {
     @Size(min = 2, max = 100)
     private String description;
 
-    @Column(name = "calories", columnDefinition = "int default 500")
+    @Column(name = "calories", nullable = false)
     @Range(min = 10, max = 10_000)
     private int calories;
 
