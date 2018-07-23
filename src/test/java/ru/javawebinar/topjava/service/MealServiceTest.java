@@ -37,8 +37,6 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 public class MealServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_RESET = "\u001B[0m";
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -57,7 +55,7 @@ public class MealServiceTest {
             total += elapsed;
             String result = String.format("Test\t%14s\ttooks\t%4d\tms\n", name.getMethodName(), elapsed);
             summary.append(result);
-            log.info(ANSI_GREEN + result + ANSI_RESET);
+            log.info(result);
         }
     };
 
@@ -67,15 +65,14 @@ public class MealServiceTest {
 
     @AfterClass
     public static void Summary() {
-        log.info(ANSI_GREEN +
+        log.info(
                 "\n=========================================================================================" +
                 "\n================================ MealServiceTest SUMMARY ================================" +
                 "\n=========================================================================================\n" +
                 summary.toString() +
                 "=========================================================================================" +
                 String.format("\nTests total elapsed time:\t\t%4d\tms", total) +
-                "\n=========================================================================================\n" +
-                ANSI_RESET
+                "\n=========================================================================================\n"
         );
 
     }
