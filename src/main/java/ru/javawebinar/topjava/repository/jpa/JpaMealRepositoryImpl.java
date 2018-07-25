@@ -6,12 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.util.CriteriaUtil;
+import ru.javawebinar.topjava.util.MealGetterWithCriteriaUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,7 +18,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class JpaMealRepositoryImpl implements MealRepository {
 
-    private CriteriaUtil criteriaUtil = new CriteriaUtil();
+    private MealGetterWithCriteriaUtil mealGetter = new MealGetterWithCriteriaUtil();
 
     @PersistenceContext
     private EntityManager em;
@@ -48,20 +47,18 @@ public class JpaMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        return DataAccessUtils.singleResult(criteriaUtil.getList(em, ((cb, root) -> Arrays.asList(
-                cb.equal(root.get("id"), id),
-                cb.equal(root.get("user").get("id"), userId)))));
+        return DataAccessUtils.singleResult(mealGetter.getList(em, userId, ((cb, root) -> Collections.singletonList(
+                cb.equal(root.get("id"), id)))));
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return criteriaUtil.getList(em, (cb, root) -> Collections.singletonList(cb.equal(root.get("user").get("id"), userId)));
+        return mealGetter.getList(em, userId, (cb, root) -> Collections.emptyList());
     }
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return criteriaUtil.getList(em, ((cb, root) -> Arrays.asList(
-                cb.equal(root.get("user").get("id"), userId),
+        return mealGetter.getList(em, userId, ((cb, root) -> Collections.singletonList(
                 cb.between(root.get("dateTime"), startDate, endDate))));
     }
 }

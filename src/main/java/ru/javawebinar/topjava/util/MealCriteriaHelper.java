@@ -8,6 +8,6 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 
 @FunctionalInterface
-public interface CriteriaHelper {
-    List<Predicate> getPredicate(CriteriaBuilder cb, Root<Meal> root);
+public interface MealCriteriaHelper {
+    List<Predicate> getPredicates(CriteriaBuilder cb, Root<Meal> root);
 }

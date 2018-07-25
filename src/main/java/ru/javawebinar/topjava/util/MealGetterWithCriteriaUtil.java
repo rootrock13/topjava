@@ -8,16 +8,22 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
-public class CriteriaUtil {
-    public List<Meal> getList(EntityManager em, CriteriaHelper criteriaHelper) {
+public class MealGetterWithCriteriaUtil {
+    public List<Meal> getList(EntityManager em, int userId, MealCriteriaHelper criteriaHelper) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Meal> criteriaQuery = cb.createQuery(Meal.class);
         Root<Meal> root = criteriaQuery.from(Meal.class);
 
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate userIdCondition = cb.equal(root.get("user").get("id"), userId);
+        predicates.add(userIdCondition);
+        predicates.addAll(criteriaHelper.getPredicates(cb, root));
+
         criteriaQuery.select(root);
-        criteriaQuery.where(criteriaHelper.getPredicate(cb, root).toArray(new Predicate[0]));
+        criteriaQuery.where(predicates.toArray(new Predicate[0]));
         criteriaQuery.orderBy(cb.desc(root.get("dateTime")));
 
         TypedQuery<Meal> query = em.createQuery(criteriaQuery);
