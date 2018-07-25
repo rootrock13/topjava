@@ -50,22 +50,22 @@ public class JpaMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        return DataAccessUtils.singleResult(getList(em, userId, ((cb, root) -> Collections.singletonList(
+        return DataAccessUtils.singleResult(getList(userId, ((cb, root) -> Collections.singletonList(
                 cb.equal(root.get("id"), id))), false));
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return getList(em, userId, (cb, root) -> Collections.emptyList(), true);
+        return getList(userId, (cb, root) -> Collections.emptyList(), true);
     }
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return getList(em, userId, ((cb, root) -> Collections.singletonList(
+        return getList(userId, ((cb, root) -> Collections.singletonList(
                 cb.between(root.get("dateTime"), startDate, endDate))), true);
     }
 
-    private List<Meal> getList(EntityManager em, int userId, CriteriaHelper criteriaHelper, boolean ordered) {
+    private List<Meal> getList(int userId, CriteriaHelper criteriaHelper, boolean ordered) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Meal> criteriaQuery = cb.createQuery(Meal.class);
         Root<Meal> root = criteriaQuery.from(Meal.class);
