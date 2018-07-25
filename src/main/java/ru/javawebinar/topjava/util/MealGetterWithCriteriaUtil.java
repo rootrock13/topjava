@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MealGetterWithCriteriaUtil {
-    public List<Meal> getList(EntityManager em, int userId, MealCriteriaHelper criteriaHelper) {
+    public List<Meal> getList(EntityManager em, int userId, MealCriteriaHelper criteriaHelper, boolean ordered) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Meal> criteriaQuery = cb.createQuery(Meal.class);
         Root<Meal> root = criteriaQuery.from(Meal.class);
@@ -24,7 +24,9 @@ public class MealGetterWithCriteriaUtil {
 
         criteriaQuery.select(root);
         criteriaQuery.where(predicates.toArray(new Predicate[0]));
-        criteriaQuery.orderBy(cb.desc(root.get("dateTime")));
+        if (ordered) {
+            criteriaQuery.orderBy(cb.desc(root.get("dateTime")));
+        }
 
         TypedQuery<Meal> query = em.createQuery(criteriaQuery);
         return query.getResultList();
