@@ -7,6 +7,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -15,16 +16,27 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
 @Transactional(readOnly = true)
 public class JpaMealRepositoryImpl implements MealRepository {
 
+    // Obtaining a CriteriaBuilder Instance in RequestBean
+    // (https://docs.oracle.com/cd/E19798-01/821-1841/bnbpy/index.html)
+    //
+    // The CrtiteriaBuilder interface defines methods to create criteria query objects and create expressions
+    // for modifying those query objects. RequestBean creates an instance of CriteriaBuilder
+    // by using a @PostConstruct method, init:
+
     @PersistenceContext
     private EntityManager em;
+    private CriteriaBuilder criteriaBuilder;
+
+    @PostConstruct
+    private void init() {
+        criteriaBuilder = em.getCriteriaBuilder();
+    }
 
     @Override
     @Transactional
@@ -50,35 +62,31 @@ public class JpaMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        return DataAccessUtils.singleResult(getList(userId, ((cb, root) -> Collections.singletonList(
-                cb.equal(root.get("id"), id))), false));
+        return DataAccessUtils.singleResult(getList(userId, false, ((root) -> criteriaBuilder.equal(root.get("id"), id))));
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return getList(userId, (cb, root) -> Collections.emptyList(), true);
+        return getList(userId, true, (root) -> criteriaBuilder.and());
     }
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return getList(userId, ((cb, root) -> Collections.singletonList(
-                cb.between(root.get("dateTime"), startDate, endDate))), true);
+        return getList(userId, true, ((root) ->
+                criteriaBuilder.between(root.get("dateTime"), startDate, endDate)));
     }
 
-    private List<Meal> getList(int userId, CriteriaHelper criteriaHelper, boolean ordered) {
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<Meal> criteriaQuery = cb.createQuery(Meal.class);
+    private List<Meal> getList(int userId, boolean ordered, CriteriaHelper criteriaHelper) {
+        CriteriaQuery<Meal> criteriaQuery = criteriaBuilder.createQuery(Meal.class);
         Root<Meal> root = criteriaQuery.from(Meal.class);
 
-        List<Predicate> predicates = new ArrayList<>();
-        Predicate userIdCondition = cb.equal(root.get("user").get("id"), userId);
-        predicates.add(userIdCondition);
-        predicates.addAll(criteriaHelper.getPredicates(cb, root));
-
         criteriaQuery.select(root);
-        criteriaQuery.where(predicates.toArray(new Predicate[0]));
+        criteriaQuery.where(
+                criteriaBuilder.equal(root.get("user").get("id"), userId),
+                criteriaHelper.getPredicate(root)
+        );
         if (ordered) {
-            criteriaQuery.orderBy(cb.desc(root.get("dateTime")));
+            criteriaQuery.orderBy(criteriaBuilder.desc(root.get("dateTime")));
         }
 
         TypedQuery<Meal> query = em.createQuery(criteriaQuery);
@@ -87,6 +95,6 @@ public class JpaMealRepositoryImpl implements MealRepository {
 
     @FunctionalInterface
     private interface CriteriaHelper {
-        List<Predicate> getPredicates(CriteriaBuilder cb, Root<Meal> root);
+        Predicate getPredicate(Root<Meal> root);
     }
 }
