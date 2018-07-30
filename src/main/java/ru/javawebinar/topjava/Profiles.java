@@ -1,7 +1,7 @@
 package ru.javawebinar.topjava;
 
 public class Profiles {
-    private static final String
+    public static final String
             JDBC = "jdbc",
             JPA = "jpa",
             DATAJPA = "datajpa";
