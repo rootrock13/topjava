@@ -1,12 +1,13 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Stopwatch;
+import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,6 +39,9 @@ public abstract class ServiceTest {
         SLF4JBridgeHandler.install();
     }
 
+    @ClassRule
+    public static ResultsLogger rule = new ResultsLogger();
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -52,19 +56,25 @@ public abstract class ServiceTest {
         }
     };
 
-    @BeforeClass
-    public static void clearResults() {
-        results.setLength(0);
-    }
-
-    @AfterClass
-    public static void printResult() {
-        log.info("\n---------------------------------" +
-                "\nDB profile: " + Profiles.getActiveDbProfile() +
-                "\n---------------------------------" +
-                "\nTest                 Duration, ms" +
-                "\n---------------------------------" +
-                results +
-                "\n---------------------------------");
+    private static class ResultsLogger implements TestRule {
+        @Override
+        public Statement apply(Statement base, Description description) {
+            return new Statement() {
+                @Override
+                public void evaluate() throws Throwable {
+                    results.setLength(0);
+                    base.evaluate();
+                    String testRunnerClassName = description.getDisplayName();
+                    log.info("\n---------------------------------" +
+                            "\nTests by " + testRunnerClassName.substring(testRunnerClassName.lastIndexOf(".") + 1) +
+                            "\nDB profile: " + Profiles.getActiveDbProfile() +
+                            "\n---------------------------------" +
+                            "\nTest                 Duration, ms" +
+                            "\n---------------------------------" +
+                            results +
+                            "\n---------------------------------");
+                }
+            };
+        }
     }
 }
