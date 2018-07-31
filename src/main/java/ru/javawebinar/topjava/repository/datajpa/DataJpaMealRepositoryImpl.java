@@ -21,7 +21,6 @@ public class DataJpaMealRepositoryImpl implements MealRepository {
         this.crudUserRepository = crudUserRepository;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Transactional
     @Override
     public Meal save(Meal meal, int userId) {
@@ -44,7 +43,7 @@ public class DataJpaMealRepositoryImpl implements MealRepository {
 
     @Override
     public Meal getWithUser(int id, int userId) {
-        return crudMealRepository.getOneByIdAndUserIdFetched(id, userId);
+        return crudMealRepository.getWithUser(id, userId);
     }
 
     @Override

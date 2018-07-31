@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Stopwatch;
@@ -30,13 +31,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public abstract class ServiceTest {
 
     private static final Logger log = getLogger("result");
-    static StringBuilder results = new StringBuilder();
-    static final String header = "\n---------------------------------" +
-            "\nTests for %s" +
-            "\nDB profile: " + Profiles.getActiveDbProfile() +
-            "\n---------------------------------" +
-            "\nTest                 Duration, ms" + "\n---------------------------------";
-    private static final String footer = "\n---------------------------------";
+    private static StringBuilder results = new StringBuilder();
 
     static {
         // needed only for java.util.logging (postgres driver)
@@ -57,10 +52,19 @@ public abstract class ServiceTest {
         }
     };
 
+    @BeforeClass
+    public static void clearResults() {
+        results.setLength(0);
+    }
+
     @AfterClass
     public static void printResult() {
-        results.append(footer);
-        log.info(results.toString());
-        results.setLength(0);
+        log.info("\n---------------------------------" +
+                "\nDB profile: " + Profiles.getActiveDbProfile() +
+                "\n---------------------------------" +
+                "\nTest                 Duration, ms" +
+                "\n---------------------------------" +
+                results +
+                "\n---------------------------------");
     }
 }

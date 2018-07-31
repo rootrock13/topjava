@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 import ru.javawebinar.topjava.MealTestData;
@@ -12,10 +11,6 @@ import static ru.javawebinar.topjava.UserTestData.*;
 
 @ActiveProfiles(Profiles.DATAJPA)
 public class DataJpaUserServiceTest extends UserServiceTest {
-    @BeforeClass
-    public static void setHeaderForResults() {
-        results.append(String.format(header, DataJpaUserServiceTest.class.getSimpleName()));
-    }
 
     @Test
     public void get() throws Exception {
