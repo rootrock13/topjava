@@ -60,7 +60,7 @@ abstract public class AbstractServiceTest {
         }
     }
 
-    boolean jdbcProfileIsNotActive() {
-        return !Arrays.asList(environment.getActiveProfiles()).contains(Profiles.JDBC);
+    boolean jdbcProfileIsActive() {
+        return Arrays.asList(environment.getActiveProfiles()).contains(Profiles.JDBC);
     }
 }

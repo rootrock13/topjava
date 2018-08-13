@@ -8,7 +8,7 @@
 <jsp:include page="fragments/bodyHeader.jsp"/>
 
 <section>
-    <h2><spring:message code="${action == 'create' ? 'meal.addTitle' : 'meal.editTitle'}"/></h2>
+    <h2><spring:message code="${meal.isNew() ? 'meal.addTitle' : 'meal.editTitle'}"/></h2>
     <hr>
     <form method="post" action="${pageContext.request.contextPath}/meals/save">
         <input type="hidden" name="id" value="${meal.id}">
