@@ -7,9 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ResourceControllerTest extends AbstractControllerTest {
+class ResourceControllerTest extends AbstractControllerTest {
     @Test
-    void testUsers() throws Exception {
+    void testResources() throws Exception {
         mockMvc.perform(get("/resources/css/style.css"))
                 .andDo(print())
                 .andExpect(status().isOk())
