@@ -73,10 +73,11 @@ class MealRestControllerTest extends AbstractControllerTest {
         System.out.println();
 
         // get actual and test
-        String url = String.format("%s/between?fromTime=%s&toTime=%s&fromDate=%s&toDate=%s",
+        String url = String.format("%sbetween?fromTime=%s&toTime=%s&fromDate=%s&toDate=%s",
                 REST_URL, fromTime, toTime, fromDate, toDate);
         TestUtil.print(mockMvc.perform(get(url))
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(contentJson(expected)));
     }
