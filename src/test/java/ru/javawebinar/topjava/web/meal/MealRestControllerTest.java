@@ -70,7 +70,6 @@ class MealRestControllerTest extends AbstractControllerTest {
                         Util.orElse(fromDate, LocalDate.MIN),
                         Util.orElse(toDate, LocalDate.MAX)))
                 .collect(Collectors.toList());
-        System.out.println();
 
         // get actual and test
         String url = String.format("%sbetween?fromTime=%s&toTime=%s&fromDate=%s&toDate=%s",
