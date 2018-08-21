@@ -17,6 +17,7 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(contentJson(MEAL1));
+                .andExpect(contentJson(Collections.singletonList(MEAL1), false));
     }
 
     @Test
@@ -50,7 +51,7 @@ class MealRestControllerTest extends AbstractControllerTest {
         TestUtil.print(mockMvc.perform(get(REST_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(contentJson(MealsUtil.getWithExceeded(MEALS, SecurityUtil.authUserCaloriesPerDay()))));
+                .andExpect(contentJson(MealsUtil.getWithExceeded(MEALS, SecurityUtil.authUserCaloriesPerDay()), true)));
     }
 
     @Test
@@ -71,13 +72,13 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(contentJson(expected)));
+                .andExpect(contentJson(expected, true)));
     }
 
     @Test
     void testGetFiltered() throws Exception {
         // filter data
-        LocalDateTime fromDateTime = LocalDateTime.of(2015, 6, 1, 14, 30);
+        LocalDateTime fromDateTime = LocalDateTime.of(2015, 6, 1, 14, 10);
         LocalDateTime toDateTime = LocalDateTime.of(2015, 6, 1, 22, 0);
 
         // prepare expected
@@ -92,7 +93,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(contentJson(expected)));
+                .andExpect(contentJson(expected, true)));
 
         // restore defaults
         SecurityUtil.setAuthUserId(USER_ID);

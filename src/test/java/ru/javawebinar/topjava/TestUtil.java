@@ -5,9 +5,10 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static ru.javawebinar.topjava.web.json.JsonUtil.writeValue;
+import static ru.javawebinar.topjava.web.json.JsonUtil.writeIgnoreProps;
 
 public class TestUtil {
 
@@ -24,7 +25,9 @@ public class TestUtil {
         return JsonUtil.readValue(getContent(action), clazz);
     }
 
-    public static <T> ResultMatcher contentJson(T expected) {
-        return content().json(writeValue(expected));
+    public static <T> ResultMatcher contentJson(List<T> expected, boolean returnCollection, String... ignoreProps) {
+        return expected.size() == 1 && !returnCollection ?
+                content().json(writeIgnoreProps(expected.get(0), ignoreProps)) :
+                content().json(writeIgnoreProps(expected, ignoreProps));
     }
 }
