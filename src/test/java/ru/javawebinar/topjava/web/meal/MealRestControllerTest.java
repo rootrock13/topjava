@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.TestUtil.contentJson;
+import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
 class MealRestControllerTest extends AbstractControllerTest {
@@ -61,16 +62,7 @@ class MealRestControllerTest extends AbstractControllerTest {
         LocalDate toDate = LocalDate.of(2015, 5, 31);
 
         // prepare expected
-        List<MealWithExceed> mealsWithExceed = MealsUtil.getFilteredWithExceeded(
-                MEALS,
-                SecurityUtil.authUserCaloriesPerDay(),
-                fromTime,
-                toTime);
-        List<MealWithExceed> expected = mealsWithExceed.stream()
-                .filter(m -> Util.isBetween(m.getDateTime().toLocalDate(),
-                        Util.orElse(fromDate, LocalDate.MIN),
-                        Util.orElse(toDate, LocalDate.MAX)))
-                .collect(Collectors.toList());
+        List<MealWithExceed> expected = prepareExpectedWithExceed(MEALS, fromDate, toDate, fromTime, toTime);
 
         // get actual and test
         String url = String.format("%sbetween?fromTime=%s&toTime=%s&fromDate=%s&toDate=%s",
@@ -80,6 +72,44 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(contentJson(expected)));
+    }
+
+    @Test
+    void testGetFiltered() throws Exception {
+        // filter data
+        LocalDateTime fromDateTime = LocalDateTime.of(2015, 6, 1, 14, 30);
+        LocalDateTime toDateTime = LocalDateTime.of(2015, 6, 1, 22, 0);
+
+        // prepare expected
+        List<MealWithExceed> expected = prepareExpectedWithExceed(ADMIN_MEALS,
+                fromDateTime.toLocalDate(), toDateTime.toLocalDate(), fromDateTime.toLocalTime(), toDateTime.toLocalTime());
+        SecurityUtil.setAuthUserId(ADMIN_ID);
+
+        // get actual and test
+        String url = String.format("%sfilter?fromDateTime=%s&toDateTime=%s",
+                REST_URL, fromDateTime, toDateTime);
+        TestUtil.print(mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentJson(expected)));
+
+        // restore defaults
+        SecurityUtil.setAuthUserId(USER_ID);
+    }
+
+    private List<MealWithExceed> prepareExpectedWithExceed(List<Meal> meals,
+                                                           LocalDate fromDate, LocalDate toDate, LocalTime fromTime, LocalTime toTime) {
+        List<MealWithExceed> mealsWithExceed = MealsUtil.getFilteredWithExceeded(
+                meals,
+                SecurityUtil.authUserCaloriesPerDay(),
+                fromTime,
+                toTime);
+        return mealsWithExceed.stream()
+                .filter(m -> Util.isBetween(m.getDateTime().toLocalDate(),
+                        Util.orElse(fromDate, LocalDate.MIN),
+                        Util.orElse(toDate, LocalDate.MAX)))
+                .collect(Collectors.toList());
     }
 
     @Test
