@@ -14,24 +14,24 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping(MealRestController.REST_URL)
+@RequestMapping(value = MealRestController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class MealRestController extends AbstractMealController {
     static final String REST_URL = "/rest/meals";
 
     @Override
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public List<MealWithExceed> getAll() {
         return super.getAll();
     }
 
     @Override
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{id}")
     public Meal get(@PathVariable("id") int id) {
         return super.get(id);
     }
 
     @Override
-    @GetMapping(value = "/between", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/between")
     public List<MealWithExceed> getBetween(@RequestParam(value = "fromDate", required = false) LocalDate startDate,
                                            @RequestParam(value = "fromTime", required = false) LocalTime startTime,
                                            @RequestParam(value = "toDate", required = false) LocalDate endDate,
@@ -40,7 +40,7 @@ public class MealRestController extends AbstractMealController {
     }
 
     @Override
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") int id) {
         super.delete(id);
@@ -52,7 +52,7 @@ public class MealRestController extends AbstractMealController {
         super.update(meal, id);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Meal> createWithLocation(@RequestBody Meal meal) {
         Meal created = super.create(meal);
 
@@ -62,6 +62,4 @@ public class MealRestController extends AbstractMealController {
 
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
-
-
 }
