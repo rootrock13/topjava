@@ -32,6 +32,10 @@ public class DateTimeUtil {
         return StringUtils.isEmpty(str) ? null : LocalTime.parse(str);
     }
 
+    public static LocalDateTime parseLocalDateTime(String str) {
+        return StringUtils.isEmpty(str) ? null : LocalDateTime.parse(str);
+    }
+
     public static class LocalDateFormatter implements Formatter<LocalDate> {
         @Override
         public LocalDate parse(String localDate, Locale locale) throws ParseException {
@@ -53,6 +57,18 @@ public class DateTimeUtil {
         @Override
         public String print(LocalTime localTime, Locale locale) {
             return localTime.format(DateTimeFormatter.ISO_LOCAL_TIME);
+        }
+    }
+
+    public static class LocalDateTimeFormatter implements Formatter<LocalDateTime> {
+        @Override
+        public LocalDateTime parse(String localDateTime, Locale locale) throws ParseException {
+            return parseLocalDateTime(localDateTime);
+        }
+
+        @Override
+        public String print(LocalDateTime localDateTime, Locale locale) {
+            return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         }
     }
 }

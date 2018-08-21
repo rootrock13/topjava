@@ -56,6 +56,7 @@
             <set>
                 <bean class="ru.javawebinar.topjava.util.DateTimeUtil.LocalDateFormatter"/>
                 <bean class="ru.javawebinar.topjava.util.DateTimeUtil.LocalTimeFormatter"/>
+                <bean class="ru.javawebinar.topjava.util.DateTimeUtil.LocalDateTimeFormatter"/>
             </set>
         </property>
     </bean>
