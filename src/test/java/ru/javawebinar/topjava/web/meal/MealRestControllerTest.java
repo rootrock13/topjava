@@ -17,7 +17,6 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +42,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(contentJson(Collections.singletonList(MEAL1), false));
+                .andExpect(contentJson(MEAL1));
     }
 
     @Test
@@ -51,7 +50,7 @@ class MealRestControllerTest extends AbstractControllerTest {
         TestUtil.print(mockMvc.perform(get(REST_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(contentJson(MealsUtil.getWithExceeded(MEALS, SecurityUtil.authUserCaloriesPerDay()), true)));
+                .andExpect(contentJson(MealsUtil.getWithExceeded(MEALS, SecurityUtil.authUserCaloriesPerDay()))));
     }
 
     @Test
@@ -72,7 +71,26 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(contentJson(expected, true)));
+                .andExpect(contentJson(expected)));
+    }
+
+    @Test
+    void testGetBetweenWithMissedParams() throws Exception {
+        // filter data
+        LocalTime fromTime = LocalTime.of(10, 30);
+        LocalDate fromDate = LocalDate.of(2015, 5, 31);
+
+        // prepare expected
+        List<MealWithExceed> expected = prepareExpectedWithExceed(MEALS, fromDate, null, fromTime, null);
+
+        // get actual and test
+        String url = String.format("%sbetween?fromTime=%s&fromDate=%s",
+                REST_URL, fromTime, fromDate);
+        TestUtil.print(mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentJson(expected)));
     }
 
     @Test
@@ -93,7 +111,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(contentJson(expected, true)));
+                .andExpect(contentJson(expected)));
 
         // restore defaults
         SecurityUtil.setAuthUserId(USER_ID);
@@ -104,8 +122,8 @@ class MealRestControllerTest extends AbstractControllerTest {
         List<MealWithExceed> mealsWithExceed = MealsUtil.getFilteredWithExceeded(
                 meals,
                 SecurityUtil.authUserCaloriesPerDay(),
-                fromTime,
-                toTime);
+                Util.orElse(fromTime, LocalTime.MIN),
+                Util.orElse(toTime, LocalTime.MAX));
         return mealsWithExceed.stream()
                 .filter(m -> Util.isBetween(m.getDateTime().toLocalDate(),
                         Util.orElse(fromDate, LocalDate.MIN),
