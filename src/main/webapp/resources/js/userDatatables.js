@@ -1,6 +1,15 @@
 var ajaxUrl = "ajax/admin/users/";
 var datatableApi;
 
+function add() {
+    $("#detailsForm").find(":input").val("");
+    $("#editRow").modal();
+}
+
+function enable(cb) {
+    console.log("User with id = " + cb.closest('tr').id + (cb.checked ? " enabled!" : " disabled!"));
+}
+
 // $(document).ready(function () {
 $(function () {
     datatableApi = $("#datatable").DataTable({

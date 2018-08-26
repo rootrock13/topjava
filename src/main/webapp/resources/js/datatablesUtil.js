@@ -11,18 +11,6 @@ function makeEditable() {
     $.ajaxSetup({cache: false});
 }
 
-function add() {
-    $("#detailsForm").find(":input").val("");
-    $("#editRow").modal();
-}
-
-function addMeal() {
-    var $modalForm = $("#detailsForm");
-    $modalForm.find(":input").val("");
-    $modalForm.find("#calories").val(500);
-    $("#editRow").modal();
-}
-
 function deleteRow(id) {
     $.ajax({
         url: ajaxUrl + id,
