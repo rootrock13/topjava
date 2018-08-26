@@ -23,6 +23,11 @@ tr[data-mealExceed="true"] {
     color: red;
 }
 
+tr[data-userEnabled="false"] {
+    color: #a8a8a8;
+    opacity: 0.5;
+}
+
 .fa {
     cursor: pointer;
 }
@@ -32,9 +37,11 @@ html {
     position: relative;
     min-height: 100%;
 }
+
 body {
     margin-bottom: 60px; /* Margin bottom by footer height */
 }
+
 .footer {
     position: absolute;
     bottom: 0;

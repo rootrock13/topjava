@@ -1,13 +1,34 @@
 var ajaxUrl = "ajax/admin/users/";
 var datatableApi;
 
+function updateTable() {
+    $.get(ajaxUrl, function (data) {
+        fillTableWithData(data);
+    });
+}
+
 function add() {
     $("#detailsForm").find(":input").val("");
     $("#editRow").modal();
 }
 
 function enable(cb) {
-    console.log("User with id = " + cb.closest('tr').id + (cb.checked ? " enabled!" : " disabled!"));
+    var enabled = cb[0].checked;
+    var id = cb[0].closest('tr').id;
+    var result = "User with id = " + id + " " + (enabled ? "enabled!" : "disabled!");
+    console.log(result);
+    var request = $.ajax({
+        type: "POST",
+        url: ajaxUrl + id,
+        data: "enabled=" + enabled
+    });
+    request.done(function () {
+        successNoty(result);
+        cb.closest("tr").attr("data-userEnabled", enabled);
+    });
+    request.fail(function () {
+        cb.prop("checked", !enabled);
+    });
 }
 
 // $(document).ready(function () {

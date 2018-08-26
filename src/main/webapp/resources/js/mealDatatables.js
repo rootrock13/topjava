@@ -1,6 +1,26 @@
 var ajaxUrl = "ajax/profile/meals/";
 var datatableApi;
 
+function clearFilter() {
+    $("#filterForm").find(":input").val("");
+    updateTable();
+}
+
+
+function updateTable() {
+    var filterForm = $("#filterForm");
+    var request = $.ajax({
+        type: "POST",
+        url: ajaxUrl + "filter",
+        data: filterForm.serialize()
+    });
+    request.done(function (data) {
+        fillTableWithData(data);
+        successNoty("Table was updated successfully!");
+    })
+
+}
+
 function add() {
     var $mealForm = $("#detailsForm");
     $mealForm.find(":input").val("");
