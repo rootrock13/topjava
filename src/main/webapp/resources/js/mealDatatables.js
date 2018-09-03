@@ -25,11 +25,11 @@ $(function () {
         "columns": [
             {
                 "data": "dateTime",
-                "render": function (date, type, row) {
+                "render": function (dateTime, type, row) {
                     if (type === "display") {
-                        return date.substring(0, 16).replace("T", " ");
+                        return formatDateTime(dateTime);
                     }
-                    return date;
+                    return dateTime;
                 }
             },
             {
@@ -63,5 +63,37 @@ $(function () {
             }
         },
         "initComplete": makeEditable
+    });
+
+    var startDate = $('#startDate');
+    var endDate = $('#endDate');
+
+    startDate.datetimepicker({
+        timepicker: false,
+        format: 'Y-m-d',
+        onShow: function (ct) {
+            this.setOptions({
+                maxDate: endDate.val() ? endDate.val() : false
+            })
+        }
+    });
+
+    endDate.datetimepicker({
+        timepicker: false,
+        format: 'Y-m-d',
+        onShow: function (ct) {
+            this.setOptions({
+                minDate: startDate.val() ? startDate.val() : false
+            })
+        }
+    });
+
+    $('#startTime, #endTime').datetimepicker({
+        datepicker: false,
+        format: 'H:i'
+    });
+
+    $('#dateTime').datetimepicker({
+        format: 'Y-m-d H:i'
     });
 });
