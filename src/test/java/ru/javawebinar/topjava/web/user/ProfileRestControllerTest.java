@@ -31,7 +31,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testGetUnAuth() throws Exception {
+    void testGetUnAuth() throws Exception {
         mockMvc.perform(get(REST_URL))
                 .andExpect(status().isUnauthorized());
     }
