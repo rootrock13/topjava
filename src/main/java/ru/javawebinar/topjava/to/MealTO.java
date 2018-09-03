@@ -13,7 +13,7 @@ public class MealTO extends BaseTo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime dateTime;
 
     @NotBlank
