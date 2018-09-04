@@ -11,6 +11,11 @@ import java.util.StringJoiner;
 
 public class ValidationUtil {
 
+    public interface TOValidationGroup {
+        // validation group marker interface for TOValidation in MealAjaxController
+        // http://blog.codeleak.pl/2014/08/validation-groups-in-spring-mvc.html
+    }
+
     public static <T> T checkNotFoundWithId(T object, int id) {
         return checkNotFound(object, "id=" + id);
     }

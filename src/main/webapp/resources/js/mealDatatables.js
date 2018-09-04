@@ -56,11 +56,7 @@ $(function () {
             ]
         ],
         "createdRow": function (row, data, dataIndex) {
-            if (data.exceed) {
-                $(row).attr("data-mealExceed", true);
-            } else {
-                $(row).attr("data-mealExceed", false);
-            }
+            $(row).attr("data-mealExceed", data.exceed);
         },
         "initComplete": makeEditable
     });
