@@ -58,8 +58,14 @@ $(function () {
         "createdRow": function (row, data, dataIndex) {
             $(row).attr("data-mealExceed", data.exceed);
         },
+
         "initComplete": makeEditable
     });
+
+    // console.log("language: " + window.navigator.language);
+    // if (window.navigator.language != "en") {
+    //     $.datetimepicker.setLocale("ru");
+    // }
 
     var startDate = $('#startDate');
     var endDate = $('#endDate');
@@ -84,9 +90,29 @@ $(function () {
         }
     });
 
-    $('#startTime, #endTime').datetimepicker({
-        datepicker: false,
-        format: 'H:i'
+    var startTime = $('#startTime');
+    var endTime = $('#endTime');
+
+    startTime.datetimepicker({
+
+        format: 'H:i',
+        onShow: function (ct) {
+            this.setOptions({
+                maxTime: endTime.val() ? endTime.val() : false
+            })
+        },
+        datepicker: false
+    });
+
+    endTime.datetimepicker({
+
+        format: 'H:i',
+        onShow: function (ct) {
+            this.setOptions({
+                minTime: startTime.val() ? startTime.val() : false
+            })
+        },
+        datepicker: false
     });
 
     $('#dateTime').datetimepicker({
