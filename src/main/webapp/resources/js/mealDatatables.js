@@ -62,10 +62,9 @@ $(function () {
         "initComplete": makeEditable
     });
 
-    // console.log("language: " + window.navigator.language);
-    // if (window.navigator.language != "en") {
-    //     $.datetimepicker.setLocale("ru");
-    // }
+    if (window.navigator.languages[0].substring(0, 2).toLocaleLowerCase() === "ru") {
+        $.datetimepicker.setLocale("ru");
+    }
 
     var startDate = $('#startDate');
     var endDate = $('#endDate');
