@@ -62,7 +62,12 @@ $(function () {
         "initComplete": makeEditable
     });
 
-    if (window.navigator.languages[0].substring(0, 2).toLocaleLowerCase() === "ru") {
+    // https://zzz.buzz/2016/01/13/detect-browser-language-in-javascript/
+    var language = navigator.languages && navigator.languages[0] ||
+        navigator.language ||
+        navigator.userLanguage;
+
+    if (language.substring(0, 2).toLocaleLowerCase() === "ru") {
         $.datetimepicker.setLocale("ru");
     }
 
