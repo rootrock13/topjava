@@ -8,6 +8,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +45,7 @@ public class ExceptionInfoHandler {
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
-    @ExceptionHandler(BindException.class)
+    @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     public ErrorInfo bindingError(HttpServletRequest req, Exception e) {
         return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
     }
@@ -70,20 +72,26 @@ public class ExceptionInfoHandler {
         }
         String message;
         if (e instanceof BindException) {
-            StringJoiner joiner = new StringJoiner("<br>");
-            ((BindException) e).getBindingResult().getFieldErrors().forEach(
-                    fe -> {
-                        String msg = fe.getDefaultMessage();
-                        assert msg != null;
-                        if (!msg.startsWith(fe.getField())) {
-                            msg = fe.getField() + ' ' + msg;
-                        }
-                        joiner.add(msg);
-                    });
-            message = joiner.toString();
+            message = getValidationResult(((BindException) e).getBindingResult(), "<br>");
+        } else if (e instanceof MethodArgumentNotValidException) {
+            message = getValidationResult(((MethodArgumentNotValidException) e).getBindingResult(), ", ");
         } else {
             message = ValidationUtil.getMessage(rootCause);
         }
         return new ErrorInfo(req.getRequestURL(), errorType, message);
+    }
+
+    private static String getValidationResult(BindingResult bindingResult, String delimiter) {
+        StringJoiner joiner = new StringJoiner(delimiter);
+        bindingResult.getFieldErrors().forEach(
+                fe -> {
+                    String msg = fe.getDefaultMessage();
+                    assert msg != null;
+                    if (!msg.startsWith(fe.getField())) {
+                        msg = fe.getField() + ' ' + msg;
+                    }
+                    joiner.add(msg);
+                });
+        return joiner.toString();
     }
 }

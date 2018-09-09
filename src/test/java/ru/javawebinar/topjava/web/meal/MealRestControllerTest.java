@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.util.exception.ErrorType;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
@@ -15,8 +16,7 @@ import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.MealTestData.assertMatch;
 import static ru.javawebinar.topjava.TestUtil.contentJson;
@@ -84,6 +84,20 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void testUpdateInvalid() throws Exception {
+        Meal invalidUpdated = getUpdated();
+        invalidUpdated.setCalories(null);
+        mockMvc.perform(put(REST_URL + MEAL1_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(invalidUpdated))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity())
+                .andDo(print())
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.detail").value("calories must not be null"));
+    }
+
+    @Test
     void testCreate() throws Exception {
         Meal created = getCreated();
         ResultActions action = mockMvc.perform(post(REST_URL)
@@ -96,6 +110,20 @@ class MealRestControllerTest extends AbstractControllerTest {
 
         assertMatch(returned, created);
         assertMatch(service.getAll(ADMIN_ID), ADMIN_MEAL2, created, ADMIN_MEAL1);
+    }
+
+    @Test
+    void testCreateInvalid() throws Exception {
+        Meal invalidCreated = getCreated();
+        invalidCreated.setDescription("1");
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(invalidCreated))
+                .with(userHttpBasic(ADMIN)))
+                .andExpect(status().isUnprocessableEntity())
+                .andDo(print())
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.detail").value("description size must be between 2 and 120"));
     }
 
     @Test

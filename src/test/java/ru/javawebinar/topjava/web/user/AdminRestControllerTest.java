@@ -6,15 +6,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import ru.javawebinar.topjava.TestUtil;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.util.exception.ErrorType;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
-import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.util.Collections;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ru.javawebinar.topjava.TestUtil.readFromJson;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.*;
@@ -89,10 +88,25 @@ class AdminRestControllerTest extends AbstractControllerTest {
         mockMvc.perform(put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(ADMIN))
-                .content(JsonUtil.writeValue(updated)))
+                .content(jsonWithPassword(updated, updated.getPassword())))
                 .andExpect(status().isNoContent());
 
         assertMatch(userService.get(USER_ID), updated);
+    }
+
+    @Test
+    void testUpdateInvalid() throws Exception {
+        User invalidUpdated = new User(USER);
+        invalidUpdated.setName("1");
+        mockMvc.perform(put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(jsonWithPassword(invalidUpdated, invalidUpdated.getPassword())))
+                .andExpect(status().isUnprocessableEntity())
+                .andDo(print())
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.detail")
+                        .value("name size must be between 2 and 100"));
     }
 
     @Test
@@ -109,6 +123,20 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
         assertMatch(returned, expected);
         assertMatch(userService.getAll(), ADMIN, expected, USER);
+    }
+
+    @Test
+    void testCreateInvalid() throws Exception {
+        User invalidExpected = new User(null, "1", "new@gmail.com", "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(jsonWithPassword(invalidExpected, "newPass")))
+                .andExpect(status().isUnprocessableEntity())
+                .andDo(print())
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.detail")
+                        .value("name size must be between 2 and 100"));
     }
 
     @Test
