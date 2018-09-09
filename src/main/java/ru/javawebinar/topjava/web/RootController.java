@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -45,14 +46,15 @@ public class RootController extends AbstractUserController {
 
     @PostMapping("/profile")
     public String updateProfile(@Valid UserTo userTo, BindingResult result, SessionStatus status) {
-        if (result.hasErrors()) {
-            return "profile";
-        } else {
+        if (!result.hasErrors()) try {
             super.update(userTo, SecurityUtil.authUserId());
             SecurityUtil.get().update(userTo);
             status.setComplete();
             return "redirect:meals";
+        } catch (DataIntegrityViolationException e) {
+            result.rejectValue("email", "user.users_unique_email_error");
         }
+        return "profile";
     }
 
     @GetMapping("/register")
@@ -64,13 +66,14 @@ public class RootController extends AbstractUserController {
 
     @PostMapping("/register")
     public String saveRegister(@Valid UserTo userTo, BindingResult result, SessionStatus status, ModelMap model) {
-        if (result.hasErrors()) {
-            model.addAttribute("register", true);
-            return "profile";
-        } else {
+        if (!result.hasErrors()) try {
             super.create(UserUtil.createNewFromTo(userTo));
             status.setComplete();
             return "redirect:login?message=app.registered&username=" + userTo.getEmail();
+        } catch (DataIntegrityViolationException e) {
+            result.rejectValue("email", "user.users_unique_email_error");
         }
+        model.addAttribute("register", true);
+        return "profile";
     }
 }

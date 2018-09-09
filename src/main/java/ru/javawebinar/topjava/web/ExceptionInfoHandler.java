@@ -2,6 +2,9 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -29,6 +32,10 @@ import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 @RestControllerAdvice(annotations = RestController.class)
 @Order(Ordered.HIGHEST_PRECEDENCE + 5)
 public class ExceptionInfoHandler {
+
+    @Autowired
+    private ReloadableResourceBundleMessageSource messageSource;
+
     private static Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
     //  http://stackoverflow.com/a/22358422/548473
@@ -63,7 +70,7 @@ public class ExceptionInfoHandler {
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
+    private ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
@@ -76,7 +83,12 @@ public class ExceptionInfoHandler {
         } else if (e instanceof MethodArgumentNotValidException) {
             message = getValidationResult(((MethodArgumentNotValidException) e).getBindingResult(), ", ");
         } else {
-            message = ValidationUtil.getMessage(rootCause);
+            if (e instanceof DataIntegrityViolationException && rootCause.toString().contains("users_unique_email_idx")) {
+                message = messageSource.getMessage("user.users_unique_email_error", null, LocaleContextHolder.getLocale());
+                System.out.println();
+            } else {
+                message = ValidationUtil.getMessage(rootCause);
+            }
         }
         return new ErrorInfo(req.getRequestURL(), errorType, message);
     }

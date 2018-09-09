@@ -13,6 +13,9 @@
 #### update User 100000 by Admin
 `curl -d '{"name": "updatedUser","email": "upUser@gmail.com","password": "newUser","roles": ["ROLE_USER"],"meals": null}' -H "Content-Type: application/json" -X PUT http://localhost:8080/topjava/rest/admin/users/100000 --user admin@gmail.com:admin`
 
+#### profile update by Admin
+`curl -d '{"name": "admin","email": "admin@gmail.com","password": "admin","caloriesPerDay": 1000}' -H "Content-Type: application/json" -X PUT http://localhost:8080/topjava/rest/profile --user admin@gmail.com:admin`
+
 #### get All Meals
 `curl -s http://localhost:8080/topjava/rest/profile/meals --user user@yandex.ru:password`
 
