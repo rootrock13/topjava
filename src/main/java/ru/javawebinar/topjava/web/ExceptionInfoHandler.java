@@ -85,7 +85,8 @@ public class ExceptionInfoHandler {
         } else {
             if (e instanceof DataIntegrityViolationException && rootCause.toString().contains("users_unique_email_idx")) {
                 message = messageSource.getMessage("user.users_unique_email_error", null, LocaleContextHolder.getLocale());
-                System.out.println();
+            } else if (e instanceof DataIntegrityViolationException && rootCause.toString().contains("meals_unique_user_datetime_idx")) {
+                message = messageSource.getMessage("meal.unique_datetime_error", null, LocaleContextHolder.getLocale());
             } else {
                 message = ValidationUtil.getMessage(rootCause);
             }

@@ -3,6 +3,8 @@ package ru.javawebinar.topjava.web.user;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.TestUtil;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
@@ -110,6 +112,22 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testUpdateWithDuplicateEmail() throws Exception {
+        User expected = new User(USER);
+        expected.setEmail("admin@gmail.com");
+        mockMvc.perform(put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(jsonWithPassword(expected, expected.getPassword())))
+                .andExpect(status().isConflict())
+                .andDo(print())
+                .andExpect(jsonPath("$.type").value(ErrorType.DATA_ERROR.name()))
+                .andExpect(jsonPath("$.detail")
+                        .value("User with this email already exists"));
+    }
+
+    @Test
     void testCreate() throws Exception {
         User expected = new User(null, "New", "new@gmail.com", "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
         ResultActions action = mockMvc.perform(post(REST_URL)
@@ -137,6 +155,21 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
                 .andExpect(jsonPath("$.detail")
                         .value("name size must be between 2 and 100"));
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testCreateWithDuplicateEmail() throws Exception {
+        User expected = new User(null, "New", "user@yandex.ru", "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(jsonWithPassword(expected, "newPass")))
+                .andExpect(status().isConflict())
+                .andDo(print())
+                .andExpect(jsonPath("$.type").value(ErrorType.DATA_ERROR.name()))
+                .andExpect(jsonPath("$.detail")
+                        .value("User with this email already exists"));
     }
 
     @Test

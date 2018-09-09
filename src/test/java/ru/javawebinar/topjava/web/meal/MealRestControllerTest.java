@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
@@ -98,6 +100,21 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testUpdateWithDuplicateDateTime() throws Exception {
+        Meal expected = getUpdated();
+        expected.setDateTime(MEAL2.getDateTime());
+        mockMvc.perform(put(REST_URL + MEAL1_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(expected))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isConflict())
+                .andDo(print())
+                .andExpect(jsonPath("$.type").value(ErrorType.DATA_ERROR.name()))
+                .andExpect(jsonPath("$.detail").value("You already have meal with this date/time"));
+    }
+
+    @Test
     void testCreate() throws Exception {
         Meal created = getCreated();
         ResultActions action = mockMvc.perform(post(REST_URL)
@@ -124,6 +141,21 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
                 .andExpect(jsonPath("$.detail").value("description size must be between 2 and 120"));
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testCreateWithDuplicateDateTime() throws Exception {
+        Meal expected = getCreated();
+        expected.setDateTime(ADMIN_MEAL1.getDateTime());
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(expected))
+                .with(userHttpBasic(ADMIN)))
+                .andExpect(status().isConflict())
+                .andDo(print())
+                .andExpect(jsonPath("$.type").value(ErrorType.DATA_ERROR.name()))
+                .andExpect(jsonPath("$.detail").value("You already have meal with this date/time"));
     }
 
     @Test
