@@ -10,7 +10,16 @@
 <div class="jumbotron pt-0">
     <div class="container">
         <c:if test="${param.error}">
-            <div class="error">${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</div>
+            <div class="error">
+                <c:choose>
+                    <c:when test="${sessionScope['SPRING_SECURITY_LAST_EXCEPTION'].message =='Bad credentials'}">
+                        <spring:message code="error.bad_credentials"/>
+                    </c:when>
+                    <c:otherwise>
+                        ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}
+                    </c:otherwise>
+                </c:choose>
+            </div>
         </c:if>
         <c:if test="${not empty param.message}">
             <div class="message"><spring:message code="${param.message}"/></div>
@@ -63,13 +72,15 @@
 </div>
 <jsp:include page="fragments/footer.jsp"/>
 <script type="text/javascript">
-<c:if test="${not empty param.username}">
+    <c:if test="${not empty param.username}">
     setCredentials("${param.username}", "");
-</c:if>
+    </c:if>
+
     function login(username, password) {
         setCredentials(username, password);
         $("#login_form").submit();
     }
+
     function setCredentials(username, password) {
         $('input[name="username"]').val(username);
         $('input[name="password"]').val(password);
