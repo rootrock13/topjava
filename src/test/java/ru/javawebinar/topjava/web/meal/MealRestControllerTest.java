@@ -96,7 +96,9 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andDo(print())
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.detail").value("calories must not be null"));
+                .andExpect(jsonPath("$.details").value(chooseMessageByLocale(
+                        "calories must not be null",
+                        "calories должно быть задано")));
     }
 
     @Test
@@ -110,8 +112,8 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(USER)))
                 .andExpect(status().isConflict())
                 .andDo(print())
-                .andExpect(jsonPath("$.type").value(ErrorType.DATA_ERROR.name()))
-                .andExpect(jsonPath("$.detail").value("You already have meal with this date/time"));
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.details").value(getValidationMessageByCode("meal.unique_datetime_error")));
     }
 
     @Test
@@ -140,7 +142,10 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andDo(print())
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.detail").value("description size must be between 2 and 120"));
+                .andExpect(jsonPath("$.details").value(chooseMessageByLocale(
+                        "description size must be between 2 and 120",
+                        "description размер должен быть между 2 и 120"
+                )));
     }
 
     @Test
@@ -154,8 +159,8 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .with(userHttpBasic(ADMIN)))
                 .andExpect(status().isConflict())
                 .andDo(print())
-                .andExpect(jsonPath("$.type").value(ErrorType.DATA_ERROR.name()))
-                .andExpect(jsonPath("$.detail").value("You already have meal with this date/time"));
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.details").value(getValidationMessageByCode("meal.unique_datetime_error")));
     }
 
     @Test

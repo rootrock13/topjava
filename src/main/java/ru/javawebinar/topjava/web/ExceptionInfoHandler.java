@@ -25,7 +25,8 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.StringJoiner;
+import java.util.ArrayList;
+import java.util.List;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -38,6 +39,9 @@ public class ExceptionInfoHandler {
 
     private static Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
+    private final static String USERS_UNIQUE_EMAIL_IDX_ERROR_KEY = "users_unique_email_idx";
+    private final static String MEALS_UNIQUE_USER_DATE_TIME_IDX_ERROR_KEY = "meals_unique_user_datetime_idx";
+
     //  http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotFoundException.class)
@@ -48,13 +52,28 @@ public class ExceptionInfoHandler {
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        return logAndGetErrorInfo(req, e, true, DATA_ERROR);
+        String errorMessage = ValidationUtil.getMessage(ValidationUtil.getRootCause(e));
+        String message = null;
+        if (errorMessage.contains(USERS_UNIQUE_EMAIL_IDX_ERROR_KEY)) {
+            message = messageSource.getMessage("user.users_unique_email_error", null, LocaleContextHolder.getLocale());
+        } else if (errorMessage.contains(MEALS_UNIQUE_USER_DATE_TIME_IDX_ERROR_KEY)) {
+            message = messageSource.getMessage("meal.unique_datetime_error", null, LocaleContextHolder.getLocale());
+        }
+        return message != null ?
+                logAndGetErrorInfo(req, e, true, VALIDATION_ERROR, message) :
+                logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     public ErrorInfo bindingError(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
+        BindingResult bindingResult;
+        if (e instanceof BindException) {
+            bindingResult = ((BindException) e).getBindingResult();
+        } else {
+            bindingResult = ((MethodArgumentNotValidException) e).getBindingResult();
+        }
+        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR, getValidationResult(bindingResult));
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
@@ -70,32 +89,23 @@ public class ExceptionInfoHandler {
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
+    private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, String... messages) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
         }
-        String message;
-        if (e instanceof BindException) {
-            message = getValidationResult(((BindException) e).getBindingResult(), "<br>");
-        } else if (e instanceof MethodArgumentNotValidException) {
-            message = getValidationResult(((MethodArgumentNotValidException) e).getBindingResult(), ", ");
-        } else {
-            if (e instanceof DataIntegrityViolationException && rootCause.toString().contains("users_unique_email_idx")) {
-                message = messageSource.getMessage("user.users_unique_email_error", null, LocaleContextHolder.getLocale());
-            } else if (e instanceof DataIntegrityViolationException && rootCause.toString().contains("meals_unique_user_datetime_idx")) {
-                message = messageSource.getMessage("meal.unique_datetime_error", null, LocaleContextHolder.getLocale());
-            } else {
-                message = ValidationUtil.getMessage(rootCause);
-            }
-        }
-        return new ErrorInfo(req.getRequestURL(), errorType, message);
+
+        return new ErrorInfo(req.getRequestURL(), errorType,
+                messages.length == 0 ?
+                        new String[]{ValidationUtil.getMessage(rootCause)} :
+                        messages
+        );
     }
 
-    private static String getValidationResult(BindingResult bindingResult, String delimiter) {
-        StringJoiner joiner = new StringJoiner(delimiter);
+    private static String[] getValidationResult(BindingResult bindingResult) {
+        List<String> messages = new ArrayList<>();
         bindingResult.getFieldErrors().forEach(
                 fe -> {
                     String msg = fe.getDefaultMessage();
@@ -103,8 +113,8 @@ public class ExceptionInfoHandler {
                     if (!msg.startsWith(fe.getField())) {
                         msg = fe.getField() + ' ' + msg;
                     }
-                    joiner.add(msg);
+                    messages.add(msg);
                 });
-        return joiner.toString();
+        return messages.toArray(new String[0]);
     }
 }

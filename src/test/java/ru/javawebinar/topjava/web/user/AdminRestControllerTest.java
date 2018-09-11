@@ -107,8 +107,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andDo(print())
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.detail")
-                        .value("name size must be between 2 and 100"));
+                .andExpect(jsonPath("$.details").value(chooseMessageByLocale(
+                        "name size must be between 2 and 100",
+                        "name размер должен быть между 2 и 100")));
     }
 
     @Test
@@ -122,9 +123,8 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .content(jsonWithPassword(expected, expected.getPassword())))
                 .andExpect(status().isConflict())
                 .andDo(print())
-                .andExpect(jsonPath("$.type").value(ErrorType.DATA_ERROR.name()))
-                .andExpect(jsonPath("$.detail")
-                        .value("User with this email already exists"));
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.details").value(getValidationMessageByCode("user.users_unique_email_error")));
     }
 
     @Test
@@ -153,8 +153,9 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andDo(print())
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.detail")
-                        .value("name size must be between 2 and 100"));
+                .andExpect(jsonPath("$.details").value(chooseMessageByLocale(
+                        "name size must be between 2 and 100",
+                        "name размер должен быть между 2 и 100")));
     }
 
     @Test
@@ -167,9 +168,8 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .content(jsonWithPassword(expected, "newPass")))
                 .andExpect(status().isConflict())
                 .andDo(print())
-                .andExpect(jsonPath("$.type").value(ErrorType.DATA_ERROR.name()))
-                .andExpect(jsonPath("$.detail")
-                        .value("User with this email already exists"));
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.details").value(getValidationMessageByCode("user.users_unique_email_error")));
     }
 
     @Test
