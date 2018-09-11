@@ -2,9 +2,11 @@ package ru.javawebinar.topjava.web.user;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.TestUtil;
+import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
@@ -15,9 +17,11 @@ import ru.javawebinar.topjava.web.json.JsonUtil;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static ru.javawebinar.topjava.TestUtil.readFromJson;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.util.UserUtil.asTo;
+import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_ROOT_URL;
 import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_URL;
 
 class ProfileRestControllerTest extends AbstractControllerTest {
@@ -88,5 +92,21 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
                 .andExpect(jsonPath("$.details").value(getValidationMessageByCode("user.users_unique_email_error")));
+    }
+
+    @Test
+    void testCreate() throws Exception {
+        User expected = new User(null, "New", "new@gmail.com", "newPass", 2300, Role.ROLE_USER);
+        ResultActions action = mockMvc.perform(post(REST_ROOT_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonWithPassword(expected, "newPass")))
+                .andDo(print())
+                .andExpect(status().isCreated());
+
+        User returned = readFromJson(action, User.class);
+        expected.setId(returned.getId());
+
+        assertMatch(returned, expected);
+        assertMatch(userService.getAll(), ADMIN, expected, USER);
     }
 }
