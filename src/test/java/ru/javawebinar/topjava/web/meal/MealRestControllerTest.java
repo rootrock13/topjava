@@ -96,9 +96,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andDo(print())
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.details").value(chooseMessageByLocale(
-                        "calories must not be null",
-                        "calories должно быть задано")));
+                .andExpect(jsonPath("$.details").value(getValidationMessageByCode("error.caloriesNotNull")));
     }
 
     @Test
@@ -142,10 +140,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andDo(print())
                 .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
-                .andExpect(jsonPath("$.details").value(chooseMessageByLocale(
-                        "description size must be between 2 and 120",
-                        "description размер должен быть между 2 и 120"
-                )));
+                .andExpect(jsonPath("$.details").value(getValidationMessageByCode("error.descriptionSize")));
     }
 
     @Test

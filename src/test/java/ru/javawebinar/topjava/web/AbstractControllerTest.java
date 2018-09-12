@@ -77,13 +77,6 @@ abstract public class AbstractControllerTest {
         }
     }
 
-    public String chooseMessageByLocale(String messageEng, String messageRu) {
-        Locale defaultLocale = getDefaultLocale();
-        return defaultLocale != null ?
-                (defaultLocale.equals(Locale.ENGLISH) ? messageEng : messageRu) :
-                null;
-    }
-
     public String getValidationMessageByCode(String messageCode) {
         Locale defaultLocale = getDefaultLocale();
         return defaultLocale != null ?
