@@ -13,7 +13,10 @@
             <div class="error">
                 <c:choose>
                     <c:when test="${sessionScope['SPRING_SECURITY_LAST_EXCEPTION'].message =='Bad credentials'}">
-                        <spring:message code="error.bad_credentials"/>
+                        <spring:message code="error.badCredentials"/>
+                    </c:when>
+                    <c:when test="${sessionScope['SPRING_SECURITY_LAST_EXCEPTION'].message =='User is disabled'}">
+                        <spring:message code="error.userIsDisabled"/>
                     </c:when>
                     <c:otherwise>
                         ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}

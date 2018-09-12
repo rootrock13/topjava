@@ -6,7 +6,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.TestUtil;
-import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
@@ -21,7 +20,7 @@ import static ru.javawebinar.topjava.TestUtil.readFromJson;
 import static ru.javawebinar.topjava.TestUtil.userHttpBasic;
 import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.util.UserUtil.asTo;
-import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_ROOT_URL;
+import static ru.javawebinar.topjava.util.UserUtil.createNewFromTo;
 import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_URL;
 
 class ProfileRestControllerTest extends AbstractControllerTest {
@@ -96,17 +95,45 @@ class ProfileRestControllerTest extends AbstractControllerTest {
 
     @Test
     void testCreate() throws Exception {
-        User expected = new User(null, "New", "new@gmail.com", "newPass", 2300, Role.ROLE_USER);
-        ResultActions action = mockMvc.perform(post(REST_ROOT_URL + "/register")
+        UserTo expectedTo = new UserTo(null, "New user to register", "nru@mail.ru", "newPassword", 2300);
+        ResultActions action = mockMvc.perform(post(REST_URL + "/register")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonWithPassword(expected, "newPass")))
+                .content(JsonUtil.writeValue(expectedTo)))
                 .andDo(print())
                 .andExpect(status().isCreated());
 
         User returned = readFromJson(action, User.class);
+        User expected = createNewFromTo(expectedTo);
         expected.setId(returned.getId());
 
         assertMatch(returned, expected);
         assertMatch(userService.getAll(), ADMIN, expected, USER);
+    }
+
+    @Test
+    void testCreateInvalid() throws Exception {
+        UserTo expectedTo = new UserTo(null, "1", "nru@mail.ru", "newPassword", 2300);
+        ResultActions action = mockMvc.perform(post(REST_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(expectedTo)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.details").value(chooseMessageByLocale(
+                        "name size must be between 2 and 100",
+                        "name размер должен быть между 2 и 100")))
+                .andDo(print());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testCreateWithDuplicateEmail() throws Exception {
+        UserTo expectedTo = new UserTo(null, "New user to register", "user@yandex.ru", "newPassword", 2300);
+        ResultActions action = mockMvc.perform(post(REST_URL + "/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(expectedTo)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.type").value(ErrorType.VALIDATION_ERROR.name()))
+                .andExpect(jsonPath("$.details").value(getValidationMessageByCode("user.users_unique_email_error")))
+                .andDo(print());
     }
 }

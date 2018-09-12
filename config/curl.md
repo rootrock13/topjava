@@ -17,7 +17,7 @@
 `curl -d '{"name": "admin","email": "admin@gmail.com","password": "admin","caloriesPerDay": 1000}' -H "Content-Type: application/json" -X PUT http://localhost:8080/topjava/rest/profile --user admin@gmail.com:admin`
 
 #### register new user (anonymous access)
-`curl -d '{"id": null,"name": "New user to register","email": "NRU@gmail.com","password": "123456", "caloriesPerDay": 2500}' -H "Content-Type: application/json" -X POST http://localhost:8080/topjava/rest/register`
+`curl -d '{"id": null,"name": "New user to register","email": "NRU@gmail.com","password": "123456", "caloriesPerDay": 2500}' -H "Content-Type: application/json" -X POST http://localhost:8080/topjava/rest/profile/register`
 
 #### get All Meals
 `curl -s http://localhost:8080/topjava/rest/profile/meals --user user@yandex.ru:password`

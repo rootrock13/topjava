@@ -14,41 +14,39 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
 
-import static ru.javawebinar.topjava.util.UserUtil.updateFromTo;
+import static ru.javawebinar.topjava.util.UserUtil.createNewFromTo;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 @RestController
-@RequestMapping(ProfileRestController.REST_ROOT_URL)
+@RequestMapping(ProfileRestController.REST_URL)
 public class ProfileRestController extends AbstractUserController {
     static final String REST_URL = "/rest/profile";
-    static final String REST_ROOT_URL = "/rest";
 
-
-    @GetMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public User get() {
         return super.get(authUserId());
     }
 
-    @DeleteMapping(value = "/profile")
+    @DeleteMapping
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete() {
         super.delete(authUserId());
     }
 
-    @PutMapping(value = "/profile", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void update(@Valid @RequestBody UserTo userTo) {
         super.update(userTo, SecurityUtil.authUserId());
     }
 
-    @GetMapping(value = "/profile/text")
+    @GetMapping(value = "/text")
     public String testUTF() {
         return "Русский текст";
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> createWithLocation(@Valid @RequestBody UserTo userTo) {
-        User userToRegister = updateFromTo(new User(), userTo);
+        User userToRegister = createNewFromTo(userTo);
         userToRegister.setRoles(Collections.singletonList(Role.ROLE_USER));
         User created = super.create(userToRegister);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
