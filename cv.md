@@ -60,7 +60,7 @@
 -  удобно иметь резюме где то в инете (hh, linkedin, google doc, чтобы им было удобно делиться).
 
 ### Позиционирование <a href="https://github.com/JavaOPs/topjava/blob/master/description.md">проекта Topjava</a>:
-- Обязательно убери из резюме **любое упоминание Junior**. Количество обращений возрастет на порядок. Ссылку на стажировку можно поставить: http://javaops.ru (в linkedin: https://www.linkedin.com/company/java-online-projects).
+- Обязательно убери из резюме **любое упоминание Junior**. Количество обращений возрастет на порядок. Ссылку на стажировку можно поставить: http://javaops.ru/view/topjava (в linkedin: https://www.linkedin.com/company/java-online-projects).
 -  После завершения проекта ты освошь все заявленные в нем технологии - вставь их в квалификацию (включая java 8 Stream and Time API). 
 - В разделе опыт работы (если нет коммерческого опыта) вставь:
 
@@ -102,6 +102,8 @@
 - Не игнорируй совместные ланчи (курилки)</li>
 - Готовься к стендапам/летучкам. Задавай на них вменяемые вопросы. Выказывай заинтересованность</li>
 - Выдели самое главное путем опроса босса и важных коллег. Не распыляйся на мелочи.</li>
+- [**5 вещей, которые разработчик должен сделать прежде чем попросить о помощи**](https://techrocks.ru/2018/07/16/5-things-a-developer-should-do-before-asking-for-help/)
 - [**Советы новичкам**](http://blog.csssr.ru/2016/09/19/how-to-be-a-beginner-developer)
+- [Нетехнические навыки](https://tproger.ru/experts/softskills-for-job)
 
 ## [Отзывы по стажировке Topjava](https://vk.com/topic-74381644_30447246)
